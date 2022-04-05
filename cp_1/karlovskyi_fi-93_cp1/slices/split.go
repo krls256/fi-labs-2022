@@ -1,3 +1,4 @@
+// Package slices implements simple function to split any slice by separator
 package slices
 
 func Split[T comparable](slice []T, sep T) [][]T {

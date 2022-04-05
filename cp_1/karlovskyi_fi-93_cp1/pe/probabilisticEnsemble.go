@@ -1,3 +1,4 @@
+// Package pe implements probabilistic ensemble
 package pe
 
 import (
