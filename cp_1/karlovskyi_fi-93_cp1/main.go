@@ -66,7 +66,7 @@ func writeReview(stat *pe.NGramStat, statType string) func(string, int) {
 			wasFirstLine = true
 		}
 		if isDetailedReview {
-			fmt.Printf("%v occurs in %2.4f%% of cases\n", s, float64(i)/float64(stat.Total))
+			fmt.Printf("%v occurs in %2.4f%% of cases\n", s, float64(i)/float64(stat.Total)*100)
 		}
 	}
 }
