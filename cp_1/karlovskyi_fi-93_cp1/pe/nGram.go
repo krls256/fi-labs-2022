@@ -5,18 +5,21 @@ import "math"
 type NGramStat struct {
 	Store map[string]int
 	Total int
+	N     int
 }
-func newStat() *NGramStat {
+
+func newStat(n int) *NGramStat {
 	return &NGramStat{
 		Store: map[string]int{},
 		Total: 0,
+		N:     n,
 	}
 }
-func (stat *NGramStat)AddNGram(str string) {
+func (stat *NGramStat) AddNGram(str string) {
 	stat.Store[str]++
 	stat.Total++
 }
-func (stat *NGramStat)ForEachInOrder(fn func(string, int)) {
+func (stat *NGramStat) ForEachInOrder(fn func(string, int)) {
 	keys := make([]string, len(stat.Store))
 	values := make([]int, len(stat.Store))
 	i := 0
@@ -41,8 +44,8 @@ func (stat *NGramStat)ForEachInOrder(fn func(string, int)) {
 			v[i+1], v[h] = v[h], v[i+1]
 			k[i+1], k[h] = k[h], k[i+1]
 			pi := i + 1
-			quickSort(k, v, l, pi - 1);
-			quickSort(k, v, pi + 1, h);
+			quickSort(k, v, l, pi-1)
+			quickSort(k, v, pi+1, h)
 		}
 	}
 
@@ -53,12 +56,12 @@ func (stat *NGramStat)ForEachInOrder(fn func(string, int)) {
 	}
 }
 
-func (stat *NGramStat)Entropy() float64 {
+func (stat *NGramStat) Entropy() float64 {
 	ent := 0.0
 	totFloat := float64(stat.Total)
 	for _, val := range stat.Store {
 		valFloat := float64(val)
-		ent -= (valFloat / totFloat) * math.Log2(valFloat / totFloat)
+		ent -= (valFloat / totFloat) * math.Log2(valFloat/totFloat)
 	}
-	return ent
+	return ent / float64(stat.N)
 }

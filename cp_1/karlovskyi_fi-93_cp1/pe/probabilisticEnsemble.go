@@ -50,7 +50,7 @@ func (pe *probabilisticEnsemble) GetNGramStatWithoutIntersection(n int) *NGramSt
 }
 
 func (pe *probabilisticEnsemble) getNGramStatByStep(n, step int) *NGramStat {
-	stat := newStat()
+	stat := newStat(n)
 	for _, slice := range slices.Split[int32](pe.analyzableText, ' ') {
 		for i := 0; i < len(slice)-n; i += step {
 			str := string(slice[i : i+n])
