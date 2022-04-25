@@ -31,5 +31,5 @@ func main() {
 	cipherTexts[5] = c.Enc(text, key5)
 	cipherTexts[10] = c.Enc(text, key10)
 	cipherTexts[20] = c.Enc(text, key20)
-	fmt.Println(freqTools.CorrespondenceIndex(cipherTexts[2]))
+	fmt.Println(freqTools.CorrespondenceIndexExpectation(text))
 }
