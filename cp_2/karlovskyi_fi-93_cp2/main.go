@@ -3,9 +3,7 @@ package main
 import (
 	"cp_2/freqTools"
 	"cp_2/vigenere"
-	"errors"
 	"fmt"
-	"math"
 	"os"
 )
 
@@ -36,45 +34,37 @@ func main() {
 
 	cipherBytes, err := os.ReadFile("./cipher.txt")
 	cipherText := []rune(string(cipherBytes))
-	keyLen, _ := findKeyLen(cipherText, 20)
-	key := findKey(cipherText, keyLen, freqTools.CountFrequencies(text))
+	keyLen, _ := freqTools.FindKeyLen(cipherText, 20)
+
+	fragmentSize := 50
+
+	fmt.Printf("Завдяння №1\n------------\n")
+	fmt.Printf("Базовый текст: %v...\n", string(text[:fragmentSize]))
+	fmt.Printf("Текст зашифрованый ключем довжини 2: %v...\n", string(cipherTexts[2][:fragmentSize]))
+	fmt.Printf("Текст зашифрованый ключем довжини 3: %v...\n", string(cipherTexts[3][:fragmentSize]))
+	fmt.Printf("Текст зашифрованый ключем довжини 4: %v...\n", string(cipherTexts[4][:fragmentSize]))
+	fmt.Printf("Текст зашифрованый ключем довжини 5: %v...\n", string(cipherTexts[5][:fragmentSize]))
+	fmt.Printf("\nЗавдяння №2\n------------\n")
+	fmt.Printf("Індекси відповідності для тексту: %1.4f\n", freqTools.CorrespondenceIndex(text))
+	fmt.Printf("Індекси відповідності для ключа довжини 2: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[2]))
+	fmt.Printf("Індекси відповідності для ключа довжини 3: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[3]))
+	fmt.Printf("Індекси відповідності для ключа довжини 4: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[4]))
+	fmt.Printf("Індекси відповідності для ключа довжини 5: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[5]))
+	fmt.Printf("Індекси відповідності для ключа довжини 10: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[10]))
+	fmt.Printf("Індекси відповідності для ключа довжини 20: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[20]))
+
+	fmt.Printf("\nЗавдяння №3\n------------\n")
+	fmt.Printf("Довжина ключа: %v\n", keyLen)
+	key := freqTools.FindKey(cipherText, keyLen, freqTools.CountFrequencies(text), alphabet)
+	fmt.Printf("Базовий ключ: %v\n", string(c.IntToRuneForKey(key)))
+	fmt.Printf("Результат дешифрування: %v...\n", string(c.Dec(cipherText, key)[:fragmentSize]))
 	key[13] = c.ReversedAlphabet['и']
 	key[15] = c.ReversedAlphabet['н']
-	fmt.Println(string(c.Dec(cipherText, key)))
-	fmt.Println(string(c.IntToRuneForKey(key)))
-}
+	fmt.Printf("Результат після корегування: %v...\n", string(c.Dec(cipherText, key)[:fragmentSize]))
+	key = freqTools.FindKeyByM(cipherText, keyLen, freqTools.ReverseCountFrequencies(text), c)
+	fmt.Printf("Базовий ключ отриманий через M(g): %v\n", string(c.IntToRuneForKey(key)))
+	fmt.Printf("Результат з ключем отриманим через M(g): %v...\n", string(c.Dec(cipherText, key)[:fragmentSize]))
 
-func findKey(cipherText []rune, keyLen int, defaultDistribution *freqTools.LanguageDistribution) []int {
-	key := make([]int, keyLen)
-	split := freqTools.SplitByKeyLen(cipherText, keyLen)
-	for i := 0; i < keyLen; i++ {
-		distr := freqTools.CountFrequencies(split[i])
-		iterator := distr.Tree.Reverse()
-		key[i] = int((iterator.Value() - defaultDistribution.Tree.Reverse().Value() + rune(len(alphabet))) % rune(len(alphabet))) /// fix
-	}
-	return key
-}
-
-func findKeyLen(cipherText []rune, keyLenLimit int) (int, error) {
-	baseKeyLen := 2
-	correspondenceIndexDelta := 1.0 / 100 // 1%
-	stat := make([]float64, keyLenLimit-baseKeyLen+1)
-	for i := baseKeyLen; i <= keyLenLimit; i++ {
-		stat[i-baseKeyLen] = freqTools.CorrespondenceIndex(freqTools.SplitByKeyLen(cipherText, i)[0])
-	}
-	keyLen := -1
-	for i := 1; i < len(stat); i++ {
-		if math.Abs(stat[i]-stat[i-1]) > correspondenceIndexDelta {
-			keyLen = i + baseKeyLen
-			if stat[i] < stat[i-1] {
-				keyLen--
-			}
-			break
-		}
-	}
-
-	if keyLen == -1 {
-		return -1, errors.New("can not find key len")
-	}
-	return keyLen, nil
+	fmt.Println("-------------------")
+	fmt.Printf("Повністью розшивфрований текст: %v\n", string(c.Dec(cipherText, key)))
 }

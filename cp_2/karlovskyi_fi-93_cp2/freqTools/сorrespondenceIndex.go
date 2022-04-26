@@ -1,12 +1,20 @@
 package freqTools
 
 import (
+	"cp_2/vigenere"
+	"errors"
 	"github.com/igrmk/treemap/v2"
+	"math"
 )
 
 type LanguageDistribution struct {
 	Total int
 	Tree  *treemap.TreeMap[int, rune]
+}
+
+type ReversedLanguageDistribution struct {
+	Total int
+	Tree  *treemap.TreeMap[rune, int]
 }
 
 func CorrespondenceIndex(text []rune) float64 {
@@ -65,4 +73,86 @@ func CountFrequencies(text []rune) *LanguageDistribution {
 		Tree:  tr,
 		Total: len(text),
 	}
+}
+
+func ReverseCountFrequencies(text []rune) *ReversedLanguageDistribution {
+	tr := treemap.New[rune, int]()
+	for k, v := range countFrequencies(text) {
+		tr.Set(k, v)
+	}
+
+	return &ReversedLanguageDistribution{
+		Tree:  tr,
+		Total: len(text),
+	}
+}
+
+func FindKeyLen(cipherText []rune, keyLenLimit int) (int, error) {
+	baseKeyLen := 2
+	correspondenceIndexDelta := 1.0 / 100 // 1%
+	stat := make([]float64, keyLenLimit-baseKeyLen+1)
+	for i := baseKeyLen; i <= keyLenLimit; i++ {
+		stat[i-baseKeyLen] = CorrespondenceIndex(SplitByKeyLen(cipherText, i)[0])
+	}
+	keyLen := -1
+	for i := 1; i < len(stat); i++ {
+		if math.Abs(stat[i]-stat[i-1]) > correspondenceIndexDelta {
+			keyLen = i + baseKeyLen
+			if stat[i] < stat[i-1] {
+				keyLen--
+			}
+			break
+		}
+	}
+
+	if keyLen == -1 {
+		return -1, errors.New("can not find key len")
+	}
+	return keyLen, nil
+}
+
+func FindKey(cipherText []rune, keyLen int, defaultDistribution *LanguageDistribution, alphabet []rune) []int {
+	key := make([]int, keyLen)
+	split := SplitByKeyLen(cipherText, keyLen)
+	for i := 0; i < keyLen; i++ {
+		distr := CountFrequencies(split[i])
+		iterator := distr.Tree.Reverse()
+		key[i] = int((iterator.Value() - defaultDistribution.Tree.Reverse().Value() + rune(len(alphabet))) % rune(len(alphabet)))
+	}
+	return key
+}
+
+func FindKeyByM(cipherText []rune, keyLen int, defaultDistribution *ReversedLanguageDistribution, alp *vigenere.Cipher) []int {
+	key := make([]int, keyLen)
+	split := SplitByKeyLen(cipherText, keyLen)
+	for i := 0; i < keyLen; i++ {
+		distr := ReverseCountFrequencies(split[i])
+		M := map[rune]float64{}
+		for iter := distr.Tree.Iterator(); iter.Valid(); iter.Next() {
+			M[iter.Key()] = m(iter.Key(), defaultDistribution, distr, alp)
+		}
+		var (
+			maxValue float64
+			maxRune  rune
+		)
+		for r, value := range M {
+			if value > maxValue {
+				maxValue = value
+				maxRune = r
+			}
+		}
+		key[i] = int(maxRune - alp.Alphabet[0])
+	}
+	return key
+}
+
+func m(g rune, defaultDistribution, currentDistribution *ReversedLanguageDistribution, alp *vigenere.Cipher) float64 {
+	m := 0.0
+	for iter := defaultDistribution.Tree.Iterator(); iter.Valid(); iter.Next() {
+		p := float64(iter.Value()) / float64(defaultDistribution.Total)
+		r := alp.Alphabet[(alp.ReversedAlphabet[g]+alp.ReversedAlphabet[iter.Key()])%len(alp.Alphabet)]
+		N, _ := currentDistribution.Tree.Get(r)
+		m += p * float64(N)
+	}
+	return m
 }

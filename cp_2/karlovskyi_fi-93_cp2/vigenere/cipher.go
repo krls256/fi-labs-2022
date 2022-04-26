@@ -2,13 +2,13 @@ package vigenere
 
 import "fmt"
 
-type cipher struct {
+type Cipher struct {
 	Alphabet         []rune
 	ReversedAlphabet map[rune]int
 }
 
-func NewCipher(Alphabet []rune) *cipher {
-	c := cipher{
+func NewCipher(Alphabet []rune) *Cipher {
+	c := Cipher{
 		Alphabet:         Alphabet,
 		ReversedAlphabet: map[rune]int{},
 	}
@@ -18,7 +18,7 @@ func NewCipher(Alphabet []rune) *cipher {
 	return &c
 }
 
-func (c *cipher) Enc(text, key []rune) []rune {
+func (c *Cipher) Enc(text, key []rune) []rune {
 	newText := make([]rune, len(text))
 	for i, r := range text {
 		if _, ok := c.ReversedAlphabet[r]; !ok {
@@ -32,7 +32,7 @@ func (c *cipher) Enc(text, key []rune) []rune {
 	return newText
 }
 
-func (c *cipher) Dec(text []rune, key []int) []rune {
+func (c *Cipher) Dec(text []rune, key []int) []rune {
 	newText := make([]rune, len(text))
 	for i, r := range text {
 		newText[i] = c.Alphabet[(c.ReversedAlphabet[r]-key[i%len(key)]+len(c.Alphabet))%len(c.Alphabet)]
@@ -40,7 +40,7 @@ func (c *cipher) Dec(text []rune, key []int) []rune {
 	return newText
 }
 
-func (c *cipher) IntToRuneForKey(key []int) []rune {
+func (c *Cipher) IntToRuneForKey(key []int) []rune {
 	newKey := make([]rune, len(key))
 	for i, val := range key {
 		newKey[i] = c.Alphabet[val]
