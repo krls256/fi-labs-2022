@@ -38,13 +38,13 @@ func main() {
 
 	fragmentSize := 50
 
-	fmt.Printf("Завдяння №1\n------------\n")
-	fmt.Printf("Базовый текст: %v...\n", string(text[:fragmentSize]))
+	fmt.Printf("Завдання №1\n------------\n")
+	fmt.Printf("Базовий текст: %v...\n", string(text[:fragmentSize]))
 	fmt.Printf("Текст зашифрованый ключем довжини 2: %v...\n", string(cipherTexts[2][:fragmentSize]))
 	fmt.Printf("Текст зашифрованый ключем довжини 3: %v...\n", string(cipherTexts[3][:fragmentSize]))
 	fmt.Printf("Текст зашифрованый ключем довжини 4: %v...\n", string(cipherTexts[4][:fragmentSize]))
 	fmt.Printf("Текст зашифрованый ключем довжини 5: %v...\n", string(cipherTexts[5][:fragmentSize]))
-	fmt.Printf("\nЗавдяння №2\n------------\n")
+	fmt.Printf("\nЗавдання №2\n------------\n")
 	fmt.Printf("Індекси відповідності для тексту: %1.4f\n", freqTools.CorrespondenceIndex(text))
 	fmt.Printf("Індекси відповідності для ключа довжини 2: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[2]))
 	fmt.Printf("Індекси відповідності для ключа довжини 3: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[3]))
@@ -53,7 +53,7 @@ func main() {
 	fmt.Printf("Індекси відповідності для ключа довжини 10: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[10]))
 	fmt.Printf("Індекси відповідності для ключа довжини 20: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[20]))
 
-	fmt.Printf("\nЗавдяння №3\n------------\n")
+	fmt.Printf("\nЗавдання №3\n------------\n")
 	fmt.Printf("Довжина ключа: %v\n", keyLen)
 	key := freqTools.FindKey(cipherText, keyLen, freqTools.CountFrequencies(text), alphabet)
 	fmt.Printf("Базовий ключ: %v\n", string(c.IntToRuneForKey(key)))
@@ -66,5 +66,5 @@ func main() {
 	fmt.Printf("Результат з ключем отриманим через M(g): %v...\n", string(c.Dec(cipherText, key)[:fragmentSize]))
 
 	fmt.Println("-------------------")
-	fmt.Printf("Повністью розшивфрований текст: %v\n", string(c.Dec(cipherText, key)))
+	fmt.Printf("Повністю розшифрований текст: %v\n", string(c.Dec(cipherText, key)))
 }
