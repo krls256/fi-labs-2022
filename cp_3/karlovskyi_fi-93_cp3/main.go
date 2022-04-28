@@ -2,6 +2,7 @@ package main
 
 import (
 	"cp_3/alphabet"
+	"cp_3/ring"
 	"cp_3/stat"
 	"fmt"
 	"os"
@@ -16,10 +17,9 @@ func main() {
 	st := stat.Stat{}
 
 	st.Append(bi)
-	for iter := st.BackIterator(); iter.Valid(); iter.Next() {
-		fmt.Printf("%v: %v\n", iter.Key(), iter.Value())
-	}
-
+	r, err := ring.NewRing(alphabet.AlpLen)
+	handleByPanic(err)
+	fmt.Println(r.SolveCongruence(4, 46))
 }
 
 func handleByPanic(err error) {

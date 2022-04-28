@@ -4,8 +4,8 @@ import "fmt"
 
 var alphabet = []string{"а", "б", "в", "г", "д", "е", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ы", "ь", "э", "ю", "я"}
 var reverseAlphabet = map[string]int{}
-var alpLen = len(alphabet)
-var alpBiLen = alpLen * alpLen
+var AlpLen = len(alphabet)
+var alpBiLen = AlpLen * AlpLen
 
 func init() {
 	for i, s := range alphabet {
@@ -16,7 +16,7 @@ func init() {
 func MonogramsToString(text []int) (string, error) {
 	str := ""
 	for _, b := range text {
-		if b > alpLen {
+		if b > AlpLen {
 			return "", IntIsOutOfRangeErr
 		}
 		str += alphabet[b]
@@ -32,8 +32,8 @@ func BigramsToString(text []int) (string, error) {
 			fmt.Println(b, alpBiLen)
 			return "", IntIsOutOfRangeErr
 		}
-		c := b % alpLen
-		a := (b - c) / alpLen
+		c := b % AlpLen
+		a := (b - c) / AlpLen
 		str += alphabet[a] + alphabet[c]
 	}
 	return str, nil
@@ -66,7 +66,7 @@ func StringToBigrams(str string) ([]int, error) {
 		} else {
 			second = 0
 		}
-		res[i] = mono[i*2]*alpLen + second
+		res[i] = mono[i*2]*AlpLen + second
 	}
 	return res, nil
 }
