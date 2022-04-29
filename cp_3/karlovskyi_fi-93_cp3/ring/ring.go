@@ -1,17 +1,20 @@
 package ring
 
-type ring struct {
+type Ring struct {
 	mod int
 }
 
-func NewRing(mod int) (*ring, error) {
+func NewRing(mod int) (*Ring, error) {
 	if mod <= 1 {
 		return nil, ModuleIsNotAdmissibleErr
 	}
-	return &ring{mod: mod}, nil
+	return &Ring{mod: mod}, nil
+}
+func (r *Ring) Mod() int {
+	return r.mod
 }
 
-func (r *ring) Inverse(a int) (int, error) {
+func (r *Ring) Inverse(a int) (int, error) {
 	a = a % r.mod
 	r1, r2 := r.mod, a
 	qs := []int{}
@@ -42,7 +45,7 @@ func gcd(a, b int) int {
 }
 
 // ax === b (mod n)
-func (r *ring) SolveCongruence(a, b int) []int {
+func (r *Ring) SolveCongruence(a, b int) []int {
 	d := gcd(r.mod, a)
 	if d == 1 {
 		aN, err := r.Inverse(a)

@@ -1,6 +1,8 @@
 package alphabet
 
-import "fmt"
+import (
+	"strings"
+)
 
 var alphabet = []string{"а", "б", "в", "г", "д", "е", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ы", "ь", "э", "ю", "я"}
 var reverseAlphabet = map[string]int{}
@@ -25,18 +27,18 @@ func MonogramsToString(text []int) (string, error) {
 }
 
 func BigramsToString(text []int) (string, error) {
-	str := ""
+	str := strings.Builder{}
 
 	for _, b := range text {
 		if b > alpBiLen {
-			fmt.Println(b, alpBiLen)
 			return "", IntIsOutOfRangeErr
 		}
 		c := b % AlpLen
 		a := (b - c) / AlpLen
-		str += alphabet[a] + alphabet[c]
+		str.Write([]byte(alphabet[a]))
+		str.Write([]byte(alphabet[c]))
 	}
-	return str, nil
+	return str.String(), nil
 }
 
 func StringToMonograms(str string) ([]int, error) {
@@ -69,4 +71,20 @@ func StringToBigrams(str string) ([]int, error) {
 		res[i] = mono[i*2]*AlpLen + second
 	}
 	return res, nil
+}
+
+func SingleMonogramToString(monogram int) (string, error) {
+	if monogram > AlpLen {
+		return "", IntIsOutOfRangeErr
+	}
+	return alphabet[monogram], nil
+}
+
+func SingleBigramToString(bigram int) (string, error) {
+	if bigram > alpBiLen {
+		return "", IntIsOutOfRangeErr
+	}
+	c := bigram % AlpLen
+	a := (bigram - c) / AlpLen
+	return alphabet[a] + alphabet[c], nil
 }

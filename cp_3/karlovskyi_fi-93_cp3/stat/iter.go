@@ -2,49 +2,49 @@ package stat
 
 import "sort"
 
-type iterator struct {
+type Iterator struct {
 	keys      []int
 	values    []int
 	index     int
 	isForward bool
 }
 
-func (it *iterator) Next() {
+func (it *Iterator) Next() {
 	it.index++
 }
 
-func (it *iterator) Valid() bool {
+func (it *Iterator) Valid() bool {
 	return len(it.keys) > it.index
 }
 
-func (it *iterator) Key() int {
+func (it *Iterator) Key() int {
 	return it.keys[it.index]
 }
 
-func (it *iterator) Value() int {
+func (it *Iterator) Value() int {
 	return it.values[it.index]
 }
 
-func (it *iterator) Len() int {
+func (it *Iterator) Len() int {
 	return len(it.keys)
 }
 
-func (it *iterator) Less(i, j int) bool {
+func (it *Iterator) Less(i, j int) bool {
 	if it.isForward {
 		return it.less(i, j)
 	}
 	return it.less(j, i)
 }
 
-func (it *iterator) Swap(i, j int) {
+func (it *Iterator) Swap(i, j int) {
 	it.values[i], it.values[j] = it.values[j], it.values[i]
 	it.keys[i], it.keys[j] = it.keys[j], it.keys[i]
 }
 
-func (it *iterator) less(i, j int) bool {
+func (it *Iterator) less(i, j int) bool {
 	return it.values[i] < it.values[j]
 }
 
-func (it *iterator) sort() {
+func (it *Iterator) sort() {
 	sort.Sort(it)
 }

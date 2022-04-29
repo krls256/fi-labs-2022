@@ -43,6 +43,12 @@ func (stat *Stat) Inc(key int) {
 	stat.inc(key)
 }
 
+func (stat *Stat) Reset() {
+	stat.init()
+	stat.total = 0
+	stat.count = map[int]int{}
+}
+
 func (stat *Stat) Append(arr []int) {
 	stat.init()
 	for _, i := range arr {
@@ -59,18 +65,18 @@ func (stat *Stat) mapToDoubleArray() ([]int, []int) {
 	}
 	return keys, values
 }
-func (stat *Stat) pureIterator() *iterator {
+func (stat *Stat) pureIterator() *Iterator {
 	keys, values := stat.mapToDoubleArray()
-	return &iterator{keys: keys, values: values}
+	return &Iterator{keys: keys, values: values}
 }
-func (stat *Stat) ForwardIterator() *iterator {
+func (stat *Stat) ForwardIterator() *Iterator {
 	it := stat.pureIterator()
 	it.isForward = true
 	it.sort()
 	return it
 }
 
-func (stat *Stat) BackIterator() *iterator {
+func (stat *Stat) BackIterator() *Iterator {
 	it := stat.pureIterator()
 	it.isForward = false
 	it.sort()
