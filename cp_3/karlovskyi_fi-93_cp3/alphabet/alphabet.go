@@ -1,6 +1,7 @@
 package alphabet
 
 import (
+	"cp_3/stat"
 	"strings"
 )
 
@@ -55,6 +56,20 @@ func StringToMonograms(str string) ([]int, error) {
 	return res, nil
 }
 
+func BigramsToMonograms(bitext []int) ([]int, error) {
+	var mono []int
+
+	for _, b := range bitext {
+		if b > alpBiLen {
+			return nil, IntIsOutOfRangeErr
+		}
+		c := b % AlpLen
+		a := (b - c) / AlpLen
+		mono = append(mono, a, c)
+	}
+	return mono, nil
+}
+
 func StringToBigrams(str string) ([]int, error) {
 	mono, err := StringToMonograms(str)
 	if err != nil {
@@ -87,4 +102,26 @@ func SingleBigramToString(bigram int) (string, error) {
 	c := bigram % AlpLen
 	a := (bigram - c) / AlpLen
 	return alphabet[a] + alphabet[c], nil
+}
+
+func CheckRealText(iter *stat.Iterator, needs, lookFor int) bool {
+	mostPopular := map[string]bool{
+		"o": true,
+		"и": true,
+		"а": true,
+		"е": true,
+		"н": true,
+		"т": true,
+		"с": true,
+		"р": true,
+	}
+	counter := 0
+	for i := 0; i < lookFor; i++ {
+		str, _ := SingleMonogramToString(iter.Key())
+		if mostPopular[str] == true {
+			counter++
+		}
+		iter.Next()
+	}
+	return counter >= needs
 }

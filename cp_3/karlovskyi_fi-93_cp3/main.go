@@ -32,49 +32,32 @@ func main() {
 	cleanIter := statClean.BackIterator()
 
 	keys := bruteforceKeys(cipherIter, cleanIter, r, 5)
-	for _, v := range keys {
-		a, b := v[0], v[1]
-		aN, err := r.Inverse(a)
+	fmt.Println("Після пошуку ключів, та їх фільтрації бачимо фрагменти:")
+	for _, key := range keys {
+		aN, err := r.Inverse(key.A)
 		if err != nil {
 			continue
 		}
-		deciphered := cipher.Dec(cipherBigram, r, aN, b)
-		str, err := alphabet.BigramsToString(deciphered)
+		deciphered := cipher.Dec(cipherBigram, r, cipher.Key{aN, key.B})
+		monograms, err := alphabet.BigramsToMonograms(deciphered)
 		handleByPanic(err)
-		monograms, err := alphabet.StringToMonograms(str)
-		handleByPanic(err)
+
 		tmpStat.Append(monograms)
 		tmpIter := tmpStat.BackIterator()
-		if CheckRealText(tmpIter, 2, 5) {
-			fmt.Print(alphabet.MonogramsToString(monograms[:50]))
-			fmt.Print(alphabet.SingleMonogramToString(tmpStat.BackIterator().Key()))
-			fmt.Println(a, b)
+		if alphabet.CheckRealText(tmpIter, 4, 5) {
+			contentToCheck, err := alphabet.MonogramsToString(monograms[:50])
+			handleByPanic(err)
+
+			fmt.Printf("Фрагмент: %v,  Ключі: (%v, %v)\n", contentToCheck, key.A, key.B)
 		}
 		tmpStat.Reset()
 	}
-
-}
-
-func CheckRealText(iter *stat.Iterator, needs, lookFor int) bool {
-	mostPopular := map[string]bool{
-		"o": true,
-		"и": true,
-		"а": true,
-		"е": true,
-		"н": true,
-		"т": true,
-		"с": true,
-		"р": true,
-	}
-	counter := 0
-	for i := 0; i < lookFor; i++ {
-		str, _ := alphabet.SingleMonogramToString(iter.Key())
-		if mostPopular[str] == true {
-			counter++
-		}
-		iter.Next()
-	}
-	return counter >= needs
+	realKey := cipher.Key{72, 805}
+	aN, _ := r.Inverse(realKey.A)
+	realDecKey := cipher.Key{aN, realKey.B}
+	fmt.Printf("Після аналізу фрагменту маємо справжній ключ: (%v, %v)\nПовний текст наведено нижче\n", realKey.A, realKey.B)
+	str, _ := alphabet.BigramsToString(cipher.Dec(cipherBigram, r, realDecKey))
+	fmt.Println(str)
 }
 
 func handleByPanic(err error) {
@@ -83,7 +66,7 @@ func handleByPanic(err error) {
 	}
 }
 
-func bruteforceKeys(cipherIter, cleanIter *stat.Iterator, r *ring.Ring, topLimit int) [][2]int {
+func bruteforceKeys(cipherIter, cleanIter *stat.Iterator, r *ring.Ring, topLimit int) []cipher.Key {
 	topClean := make([]int, topLimit)
 	topCipher := make([]int, topLimit)
 	for i := 0; i < topLimit && cipherIter.Valid() && cleanIter.Valid(); i++ {
@@ -92,7 +75,7 @@ func bruteforceKeys(cipherIter, cleanIter *stat.Iterator, r *ring.Ring, topLimit
 		cipherIter.Next()
 		cleanIter.Next()
 	}
-	res := [][2]int{}
+	var res []cipher.Key
 	// needs better cycle
 	for i := 0; i < topLimit; i++ {
 		for j := i + 1; j < topLimit; j++ {
@@ -110,7 +93,7 @@ func bruteforceKeys(cipherIter, cleanIter *stat.Iterator, r *ring.Ring, topLimit
 					}
 					a := aH[0]
 					b := (Y1 - a*X1 + r.Mod()*a) % r.Mod()
-					res = append(res, [2]int{a, b})
+					res = append(res, cipher.Key{a, b})
 				}
 			}
 		}
