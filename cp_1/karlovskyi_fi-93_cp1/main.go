@@ -9,6 +9,7 @@ import (
 )
 
 var alphabet = []string{"А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю", "Я"}
+var alphabetWithSpace = []string{"А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю", "Я", " "}
 var isDetailedReview bool
 
 func init() {
@@ -35,7 +36,7 @@ func main() {
 	eWithoutSpaces.AddText(string(content))
 	eWithoutSpaces.AddText(string(content2))
 
-	eWithSpaces := pe.New(alphabet)
+	eWithSpaces := pe.New(alphabetWithSpace)
 	eWithSpaces.AddTextWithSpaces(string(content))
 	eWithSpaces.AddTextWithSpaces(string(content2))
 
