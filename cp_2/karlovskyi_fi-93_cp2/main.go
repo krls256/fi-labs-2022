@@ -4,6 +4,7 @@ import (
 	"cp_2/freqTools"
 	"cp_2/vigenere"
 	"fmt"
+	"golang.org/x/exp/rand"
 	"os"
 )
 
@@ -15,6 +16,17 @@ var key4 = []rune("иомл")
 var key5 = []rune("цигкц")
 var key10 = []rune("овлшытсбих")
 var key20 = []rune("икуитокшщиощушитиуки")
+var keys [][]rune
+
+func init() {
+	for i := 6; i <= 30; i++ {
+		key := []rune{}
+		for j := 0; j < i; j++ {
+			key = append(key, alphabet[rand.Intn(len(alphabet))])
+		}
+		keys = append(keys, key)
+	}
+}
 
 var cipherTexts = map[int][]rune{}
 
@@ -46,12 +58,15 @@ func main() {
 	fmt.Printf("Текст зашифрованый ключем довжини 5: %v...\n", string(cipherTexts[5][:fragmentSize]))
 	fmt.Printf("\nЗавдання №2\n------------\n")
 	fmt.Printf("Індекси відповідності для тексту: %1.4f\n", freqTools.CorrespondenceIndex(text))
+
 	fmt.Printf("Індекси відповідності для ключа довжини 2: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[2]))
 	fmt.Printf("Індекси відповідності для ключа довжини 3: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[3]))
 	fmt.Printf("Індекси відповідності для ключа довжини 4: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[4]))
 	fmt.Printf("Індекси відповідності для ключа довжини 5: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[5]))
-	fmt.Printf("Індекси відповідності для ключа довжини 10: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[10]))
-	fmt.Printf("Індекси відповідності для ключа довжини 20: %1.4f\n", freqTools.CorrespondenceIndex(cipherTexts[20]))
+	for i := 0; i < len(keys); i++ {
+		key := keys[i]
+		fmt.Printf("Індекси відповідності для ключа довжини %v: %1.4f, ключ: %v\n", len(key), freqTools.CorrespondenceIndex(c.Enc(text, key)), string(key))
+	}
 
 	fmt.Printf("\nЗавдання №3\n------------\n")
 	fmt.Printf("Довжина ключа: %v\n", keyLen)

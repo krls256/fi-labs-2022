@@ -3,6 +3,7 @@ package freqTools
 import (
 	"cp_2/vigenere"
 	"errors"
+	"fmt"
 	"github.com/igrmk/treemap/v2"
 	"math"
 )
@@ -125,6 +126,7 @@ func FindKey(cipherText []rune, keyLen int, defaultDistribution *LanguageDistrib
 func FindKeyByM(cipherText []rune, keyLen int, defaultDistribution *ReversedLanguageDistribution, alp *vigenere.Cipher) []int {
 	key := make([]int, keyLen)
 	split := SplitByKeyLen(cipherText, keyLen)
+	stat := []*treemap.TreeMap[rune, float64]{}
 	for i := 0; i < keyLen; i++ {
 		distr := ReverseCountFrequencies(split[i])
 		M := map[rune]float64{}
@@ -135,15 +137,31 @@ func FindKeyByM(cipherText []rune, keyLen int, defaultDistribution *ReversedLang
 			maxValue float64
 			maxRune  rune
 		)
+		statMap := treemap.New[rune, float64]()
 		for r, value := range M {
 			if value > maxValue {
 				maxValue = value
 				maxRune = r
+				statMap.Set(r, value)
 			}
 		}
 		key[i] = int(maxRune - alp.Alphabet[0])
+		stat = append(stat, statMap)
 	}
+	showStat(stat)
 	return key
+}
+
+func showStat(stat []*treemap.TreeMap[rune, float64]) {
+	for i := 0; i < len(stat); i++ {
+		m := stat[i]
+		fmt.Print(i+1, " ")
+		for iter := m.Iterator(); iter.Valid(); iter.Next() {
+			fmt.Printf("%v: %1.3f ", string(iter.Key()), iter.Value())
+		}
+		fmt.Print("\n")
+	}
+
 }
 
 func m(g rune, defaultDistribution, currentDistribution *ReversedLanguageDistribution, alp *vigenere.Cipher) float64 {
