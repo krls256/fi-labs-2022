@@ -95,6 +95,9 @@ func FindKeyLen(cipherText []rune, keyLenLimit int) (int, error) {
 	for i := baseKeyLen; i <= keyLenLimit; i++ {
 		stat[i-baseKeyLen] = CorrespondenceIndex(SplitByKeyLen(cipherText, i)[0])
 	}
+	for k, v := range stat {
+		fmt.Printf("r = %v, index = %1.2f%%\n", k+2, v*100)
+	}
 	keyLen := -1
 	for i := 1; i < len(stat); i++ {
 		if math.Abs(stat[i]-stat[i-1]) > correspondenceIndexDelta {
@@ -148,7 +151,7 @@ func FindKeyByM(cipherText []rune, keyLen int, defaultDistribution *ReversedLang
 		key[i] = int(maxRune - alp.Alphabet[0])
 		stat = append(stat, statMap)
 	}
-	showStat(stat)
+	//showStat(stat)
 	return key
 }
 
